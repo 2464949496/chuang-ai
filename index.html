@@ -922,11 +922,12 @@ function calcStreak(history) {
 
 function updateNav() {
   const user = getCurrentUser();
+  const pts = user ? user.points : 0;
   const navRight = document.getElementById('navRight');
   if (user) {
     navRight.innerHTML = `
       <div class="points-badge" onclick="openUserPanel()" title="点击查看账户">
-        💎 <span class="num">${user.points}</span>
+        💎 <span class="num">${pts}</span>
       </div>
       <div class="user-avatar" onclick="openUserPanel()" title="${user.name || user.email}">
         ${(user.name || user.email).charAt(0).toUpperCase()}
@@ -954,17 +955,16 @@ function updateNav() {
 }
 
 function updateCostDisplay() {
-  const user = getCurrentUser();
+  const pts = getPoints();
   const imgCost = document.getElementById('imgCost');
   const videoCost = document.getElementById('videoCost');
-  if (!user) {
+  if (pts === null) {
     imgCost.innerHTML = '每次消耗 <b>10</b> 积分';
     videoCost.innerHTML = '每次消耗 <b>50</b> 积分';
     imgCost.className = 'demo-cost';
     videoCost.className = 'demo-cost';
     return;
   }
-  const pts = user.points;
   imgCost.innerHTML = pts >= IMG_COST ? `每次消耗 <b>10</b> 积分（剩余 ${pts}）` : `<b>⚠️ 积分不足</b>（需要 10，当前 ${pts}）`;
   videoCost.innerHTML = pts >= VIDEO_COST ? `每次消耗 <b>50</b> 积分（剩余 ${pts}）` : `<b>⚠️ 积分不足</b>（需要 50，当前 ${pts}）`;
   imgCost.className = 'demo-cost ' + (pts >= IMG_COST ? 'affordable' : 'expensive');
@@ -982,8 +982,9 @@ function saveWork(type, url, prompt) {
 }
 
 function deductPoints(cost) {
-  const user = getCurrentUser(); if (!user) return false;
-  const session = getSession(); const users = getAllUsers();
+  const session = sessionStorage.getItem(SESSION_KEY);
+  if (!session) return false;
+  const users = getAllUsers();
   if ((users[session].points || 0) < cost) return false;
   users[session].points -= cost; saveUsers(users); updateNav(); return true;
 }
@@ -1001,10 +1002,19 @@ const imgBtn = document.getElementById('imgGenBtn');
 const imgInput = imgBtn.closest('.demo-panel').querySelector('.demo-input');
 const imgPreview = document.getElementById('imgPreview');
 
+function getPoints() {
+  const session = sessionStorage.getItem(SESSION_KEY);
+  if (!session) return null;
+  const users = getAllUsers();
+  return users[session] ? users[session].points : null;
+}
+
 imgBtn.addEventListener('click', async function () {
-  const user = getCurrentUser();
-  if (!user) { openModal('login'); return; }
-  if (user.points < IMG_COST) { showToast(`积分不足！需要 ${IMG_COST} 积分，当前 ${user.points} 积分`); openUserPanel(); return; }
+  const session = sessionStorage.getItem(SESSION_KEY);
+  if (!session) { openModal('login'); return; }
+  const pts = getPoints();
+  if (pts === null) { openModal('login'); return; }
+  if (pts < IMG_COST) { showToast(`积分不足！需要 ${IMG_COST} 积分，当前 ${pts} 积分`); openUserPanel(); return; }
   const prompt = imgInput.value.trim();
   if (!prompt) { imgInput.style.borderColor = 'rgba(255,110,180,0.6)'; setTimeout(() => imgInput.style.borderColor = '', 1500); return; }
   imgBtn.textContent = '生成中…'; imgBtn.disabled = true;
@@ -1044,9 +1054,11 @@ function setVideoStatus(icon, text, spin) {
 }
 
 videoBtn.addEventListener('click', async function () {
-  const user = getCurrentUser();
-  if (!user) { openModal('login'); return; }
-  if (user.points < VIDEO_COST) { showToast(`积分不足！需要 ${VIDEO_COST} 积分，当前 ${user.points} 积分`); openUserPanel(); return; }
+  const session = sessionStorage.getItem(SESSION_KEY);
+  if (!session) { openModal('login'); return; }
+  const pts = getPoints();
+  if (pts === null) { openModal('login'); return; }
+  if (pts < VIDEO_COST) { showToast(`积分不足！需要 ${VIDEO_COST} 积分，当前 ${pts} 积分`); openUserPanel(); return; }
   const prompt = videoInput.value.trim();
   if (!prompt) { videoInput.style.borderColor = 'rgba(255,110,180,0.6)'; setTimeout(() => videoInput.style.borderColor = '', 1500); return; }
   videoBtn.textContent = '提交中…'; videoBtn.disabled = true;
