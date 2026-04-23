@@ -497,6 +497,7 @@
     <a href="#features">功能</a>
     <a href="#demo">体验</a>
     <a href="#deploy">上线</a>
+    <a href="#" onclick="openAdminPanel();return false" style="color:#ffb4d9">🔐 管理</a>
   </div>
   <div class="nav-btns" id="navRight"></div>
 </nav>
@@ -734,8 +735,55 @@
       <div class="checkin-reward">本周签到满7天额外奖励 +30 积分</div>
     </div>
     <div class="panel-section-title">快捷操作</div>
-    <button class="panel-btn" onclick="resetPoints()">🔄 重置积分（测试用）</button>
     <button class="panel-btn logout" onclick="logout()">🚪 退出登录</button>
+  </div>
+</div>
+
+<!-- 管理员后台面板 -->
+<div class="user-panel-overlay" id="adminOverlay" onclick="closeAdminPanel()"></div>
+<div class="user-panel" id="adminPanel">
+  <div class="user-panel-header">
+    <div class="user-panel-avatar">🔐</div>
+    <div>
+      <div class="user-panel-name">管理员后台</div>
+      <div class="user-panel-sub">用户与积分管理</div>
+    </div>
+  </div>
+
+  <!-- 管理员登录 -->
+  <div id="adminLoginSection">
+    <div class="panel-section-title">管理员登录</div>
+    <div class="form-group" style="margin-bottom:8px">
+      <input class="form-input" type="password" id="adminKeyInput" placeholder="输入管理员密钥" />
+    </div>
+    <button class="btn-submit" onclick="adminLogin()" style="width:100%;margin-bottom:12px">进入后台</button>
+    <div style="font-size:11px;color:rgba(224,224,240,0.4);text-align:center">默认密钥: admin123</div>
+  </div>
+
+  <!-- 管理员内容 -->
+  <div id="adminContentSection" style="display:none">
+    <div class="panel-section-title">👥 用户列表</div>
+    <div style="margin-bottom:8px">
+      <input class="form-input" type="text" id="adminSearchInput" placeholder="搜索邮箱或昵称" oninput="filterAdminUsers()" />
+    </div>
+    <div id="adminUserList" style="max-height:200px;overflow-y:auto;margin-bottom:12px"></div>
+
+    <div class="panel-section-title">✏️ 积分操作</div>
+    <div id="adminSelectedUser" style="font-size:12px;color:rgba(224,224,240,0.6);margin-bottom:8px">请从上方选择用户</div>
+    <div style="display:flex;gap:8px;margin-bottom:8px">
+      <input class="form-input" type="number" id="adminPointsInput" placeholder="积分数量" style="flex:1" />
+      <select id="adminPointsAction" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:0 8px;color:#e0e0f0;font-size:13px">
+        <option value="add">增加</option>
+        <option value="subtract">减少</option>
+        <option value="set">设为</option>
+      </select>
+    </div>
+    <button class="btn-submit" onclick="adminApplyPoints()" style="width:100%;margin-bottom:12px">确认修改</button>
+
+    <div class="panel-section-title">📊 统计概览</div>
+    <div id="adminStats" style="font-size:12px;color:rgba(224,224,240,0.6);line-height:1.8"></div>
+
+    <button class="panel-btn logout" onclick="adminLogout()" style="margin-top:12px">🚪 退出管理</button>
   </div>
 </div>
 
@@ -822,11 +870,8 @@ function handleAuth(e) {
 }
 
 function logout() { sessionStorage.removeItem(SESSION_KEY); closeUserPanel(); updateNav(); showToast('已退出登录'); }
-function resetPoints() {
-  const user = getCurrentUser(); if (!user) return;
-  const users = getAllUsers(); users[getSession()].points = 500; saveUsers(users);
-  updateNav(); updateUserPanel(); showToast('积分已重置为 500');
-}
+
+
 
 function doCheckin() {
   const user = getCurrentUser();
@@ -1111,6 +1156,129 @@ const style = document.createElement('style');
 style.textContent = '@keyframes spin { from{transform:rotate(0)} to{transform:rotate(360deg)} }';
 document.head.appendChild(style);
 document.getElementById('authModal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
+
+// ===== 管理员后台 =====
+let adminMode = false;
+let selectedAdminUser = null;
+const ADMIN_KEY = 'admin123'; // 管理员密钥
+
+function openAdminPanel() {
+  document.getElementById('adminOverlay').style.display = 'block';
+  document.getElementById('adminPanel').style.right = '0';
+  if (sessionStorage.getItem('chuangai_admin') === '1') {
+    adminMode = true;
+    document.getElementById('adminLoginSection').style.display = 'none';
+    document.getElementById('adminContentSection').style.display = 'block';
+    renderAdminUserList();
+    renderAdminStats();
+  }
+}
+
+function closeAdminPanel() {
+  document.getElementById('adminOverlay').style.display = 'none';
+  document.getElementById('adminPanel').style.right = '-420px';
+}
+
+function adminLogin() {
+  const key = document.getElementById('adminKeyInput').value.trim();
+  if (key === ADMIN_KEY) {
+    adminMode = true;
+    sessionStorage.setItem('chuangai_admin', '1');
+    document.getElementById('adminLoginSection').style.display = 'none';
+    document.getElementById('adminContentSection').style.display = 'block';
+    renderAdminUserList();
+    renderAdminStats();
+    showToast('管理员登录成功');
+  } else {
+    showToast('密钥错误');
+  }
+}
+
+function adminLogout() {
+  adminMode = false;
+  selectedAdminUser = null;
+  sessionStorage.removeItem('chuangai_admin');
+  document.getElementById('adminLoginSection').style.display = 'block';
+  document.getElementById('adminContentSection').style.display = 'none';
+  document.getElementById('adminKeyInput').value = '';
+  document.getElementById('adminSelectedUser').textContent = '请从上方选择用户';
+  closeAdminPanel();
+  showToast('已退出管理');
+}
+
+function renderAdminUserList(filter) {
+  const users = getAllUsers();
+  const container = document.getElementById('adminUserList');
+  const list = Object.entries(users).filter(([email, u]) => {
+    if (!filter) return true;
+    const f = filter.toLowerCase();
+    return email.toLowerCase().includes(f) || (u.name && u.name.toLowerCase().includes(f));
+  });
+  
+  if (list.length === 0) {
+    container.innerHTML = '<div style="font-size:12px;color:rgba(224,224,240,0.4);padding:12px;text-align:center">暂无用户</div>';
+    return;
+  }
+  
+  container.innerHTML = list.map(([email, u]) => {
+    const isSelected = selectedAdminUser === email;
+    const date = new Date(u.created).toLocaleDateString('zh-CN');
+    return `<div onclick="selectAdminUser('${email}')" style="padding:8px 10px;margin-bottom:4px;border-radius:8px;cursor:pointer;background:${isSelected ? 'rgba(108,71,255,0.25)' : 'rgba(255,255,255,0.03)'};border:1px solid ${isSelected ? 'rgba(108,71,255,0.5)' : 'transparent'}">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:13px;font-weight:500">${u.name || email}</span>
+        <span style="font-size:12px;color:#6c47ff;font-weight:600">💎 ${u.points}</span>
+      </div>
+      <div style="font-size:11px;color:rgba(224,224,240,0.4);margin-top:2px">${email}</div>
+    </div>`;
+  }).join('');
+}
+
+function filterAdminUsers() {
+  const filter = document.getElementById('adminSearchInput').value.trim();
+  renderAdminUserList(filter);
+}
+
+function selectAdminUser(email) {
+  selectedAdminUser = email;
+  const users = getAllUsers();
+  const user = users[email];
+  document.getElementById('adminSelectedUser').innerHTML = `已选中: <b>${user.name || email}</b> (当前: 💎${user.points}积分)`;
+  renderAdminUserList(document.getElementById('adminSearchInput').value.trim());
+}
+
+function adminApplyPoints() {
+  if (!selectedAdminUser) {
+    showToast('请先选择用户');
+    return;
+  }
+  const amount = parseInt(document.getElementById('adminPointsInput').value);
+  const action = document.getElementById('adminPointsAction').value;
+  if (isNaN(amount) || amount < 0) {
+    showToast('请输入有效的积分数量');
+    return;
+  }
+  const users = getAllUsers();
+  let newPoints = users[selectedAdminUser].points;
+  if (action === 'add') newPoints += amount;
+  else if (action === 'subtract') newPoints = Math.max(0, newPoints - amount);
+  else if (action === 'set') newPoints = amount;
+  users[selectedAdminUser].points = newPoints;
+  saveUsers(users);
+  document.getElementById('adminPointsInput').value = '';
+  renderAdminUserList(document.getElementById('adminSearchInput').value.trim());
+  renderAdminStats();
+  selectAdminUser(selectedAdminUser);
+  showToast(`已更新！用户现有 💎${newPoints} 积分`);
+}
+
+function renderAdminStats() {
+  const users = getAllUsers();
+  const userList = Object.values(users);
+  const totalUsers = userList.length;
+  const totalPoints = userList.reduce((sum, u) => sum + (u.points || 0), 0);
+  const totalWorks = userList.reduce((sum, u) => sum + (u.works ? u.works.length : 0), 0);
+  document.getElementById('adminStats').innerHTML = `总用户数: <b>${totalUsers}</b> 人<br>积分总量: <b>${totalPoints}</b><br>作品总数: <b>${totalWorks}</b>`;
+}
 </script>
 
 </body>
