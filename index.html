@@ -493,9 +493,6 @@
 
 <nav>
   <div class="logo" onclick="document.getElementById('home').scrollIntoView({behavior:'smooth'})">✦ 创AI</div>
-  <div class="nav-links">
-    <a href="#" onclick="window.open('admin.html','_blank');return false" style="color:#ffb4d9">🔐 管理</a>
-  </div>
   <div class="nav-btns" id="navRight"></div>
 </nav>
 
@@ -512,6 +509,136 @@
     <div class="gallery-item">🌸</div>
     <div class="gallery-item">🏙️</div>
     <div class="gallery-item">🦋</div>
+  </div>
+</section>
+
+<!-- 功能介绍 -->
+<section class="features" id="features">
+  <div class="fade-in">
+    <div class="section-label">核心功能</div>
+    <div class="section-title">你能用它做什么？</div>
+    <div class="section-sub">集AI绘图、视频生成、积分系统、每日签到于一体。</div>
+  </div>
+  <div class="features-grid fade-in">
+    <div class="feat-card">
+      <div class="feat-icon" style="background:linear-gradient(135deg,#6c47ff22,#b06ef322)">🎨</div>
+      <h3>AI 图片生成</h3>
+      <p>输入中文描述，秒级生成高质量图片。支持写实、动漫、油画等多种风格。</p>
+      <span class="feat-tag">⚡ 30秒出图</span>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon" style="background:linear-gradient(135deg,#ff6eb422,#ff9a5422)">🎬</div>
+      <h3>AI 视频生成</h3>
+      <p>文字变视频，图片变动画。AI理解你的创意，生成流畅生动的短视频。</p>
+      <span class="feat-tag">🎞️ 支持30秒视频</span>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon" style="background:linear-gradient(135deg,#fff34722,#ffb64722)">🎁</div>
+      <h3>每日签到 & 积分</h3>
+      <p>每日签到领积分，连续签到额外奖励，积分可用来生成更多精彩内容。</p>
+      <span class="feat-tag">🎯 完全免费起步</span>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon" style="background:linear-gradient(135deg,#ff47c622,#c447ff22)">📱</div>
+      <h3>手机电脑通用</h3>
+      <p>响应式设计，无论手机、平板还是电脑，随时随地创作，无需下载安装。</p>
+      <span class="feat-tag">✅ 跨设备同步</span>
+    </div>
+  </div>
+</section>
+
+<!-- AI体验区 -->
+<section class="demo-section" id="demo">
+  <div class="fade-in">
+    <div class="section-label">立即体验</div>
+    <div class="section-title">输入想法，AI帮你实现</div>
+    <div class="section-sub" id="demoSub">注册即送100积分，每日签到再领积分。</div>
+  </div>
+  <div class="demo-box fade-in">
+    <div class="demo-panel">
+      <h3>🎨 AI 图片生成</h3>
+      <p class="desc">描述你想要的画面，AI帮你画出来</p>
+      <textarea class="demo-input" rows="4" placeholder="例如：一只可爱的柴犬坐在樱花树下，水彩风格，粉色调，超清画质"></textarea>
+      <div class="demo-actions">
+        <span class="demo-hint">💡 中文描述效果更佳</span>
+        <span class="demo-cost" id="imgCost">每次消耗 <b>10</b> 积分</span>
+        <button class="btn-gen" id="imgGenBtn">生成图片</button>
+      </div>
+      <div class="demo-preview" id="imgPreview">
+        <div class="icon">🖼️</div>
+        <span>图片将在这里显示</span>
+      </div>
+    </div>
+    <div class="demo-panel">
+      <h3>🎬 AI 视频生成</h3>
+      <p class="desc">描述你想要的视频场景，AI帮你制作</p>
+      <textarea class="demo-input" rows="4" placeholder="例如：城市夜景延时摄影，霓虹灯流光溢彩，车流穿梭，科幻感十足"></textarea>
+      <div class="demo-actions">
+        <span class="demo-hint">⏱️ 生成约需1-3分钟</span>
+        <span class="demo-cost" id="videoCost">每次消耗 <b>50</b> 积分</span>
+        <button class="btn-gen" id="videoGenBtn">生成视频</button>
+      </div>
+      <div class="demo-preview" id="videoPreview">
+        <div class="icon">🎞️</div>
+        <span>视频将在这里播放</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 上线指南 -->
+<section class="deploy-section" id="deploy">
+  <div class="fade-in">
+    <div class="section-label">上线指南</div>
+    <div class="section-title">让全世界都能访问你的网站</div>
+    <div class="section-sub">按以下步骤操作，5分钟完成部署，完全免费！</div>
+  </div>
+  <div class="deploy-steps fade-in">
+    <div class="deploy-step">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <h3>🏷️ 重命名入口文件 <span class="pending-check">○</span></h3>
+        <p>Vercel 识别 <code>index.html</code> 为网站入口。将当前的 <code>index.html</code> 保持不变，这是正确的。</p>
+      </div>
+    </div>
+    <div class="deploy-step">
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <h3>📦 准备 GitHub <span class="pending-check">○</span></h3>
+        <p>如果还没有 GitHub 账号，先去注册一个：<strong>github.com</strong>（用邮箱注册，完全免费）</p>
+        <div class="note">💡 GitHub 是代码仓库，用来存放你的网站代码</div>
+      </div>
+    </div>
+    <div class="deploy-step">
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <h3>⬆️ 上传到 GitHub <span class="pending-check">○</span></h3>
+        <p>在 GitHub 新建一个仓库（Repository），命名为 <code>chuang-ai</code>，设置为 Public（公开），然后把 <code>index.html</code> 上传进去。</p>
+        <div class="note">💡 可以用 GitHub 网页直接上传：点击仓库 → Add file → Upload files → 拖入 index.html → Commit changes</div>
+      </div>
+    </div>
+    <div class="deploy-step">
+      <div class="step-num">4</div>
+      <div class="step-content">
+        <h3>🚀 连接 Vercel <span class="pending-check">○</span></h3>
+        <p>打开 <strong>vercel.com</strong>，用 GitHub 账号登录，点击 "Add New Project"，选择刚才的 <code>chuang-ai</code> 仓库，点击 Deploy！</p>
+        <div class="note">💡 Vercel 会自动检测到 index.html 并配置好一切，无需任何设置</div>
+      </div>
+    </div>
+    <div class="deploy-step">
+      <div class="step-num">5</div>
+      <div class="step-content">
+        <h3>🌐 获得你的网址 <span class="pending-check">○</span></h3>
+        <p>部署完成后，Vercel 会给你一个免费域名，格式类似：<code>chuang-ai.vercel.app</code></p>
+        <p>任何人都可以通过这个网址访问你的AI创作平台！</p>
+        <div class="note">💡 可选：用阿里云/腾讯云购买域名（约50元/年），绑定到 Vercel，获得你自己的品牌域名</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="success-banner fade-in">
+    <h3>🎉 恭喜！你的AI平台已上线！</h3>
+    <p>任何人都可以通过这个网址访问，所有功能（AI绘图、视频、积分系统）全部正常工作！</p>
   </div>
 </section>
 
