@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>管理后台 · 创AI</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background: #0a0a14;
+      color: #e0e0f0;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+    :root {
+      --grad: linear-gradient(135deg, #6c47ff 0%, #b06ef3 50%, #ff6eb4 100%);
+      --purple: #6c47ff;
+      --pink: #ff6eb4;
+      --card-bg: rgba(255,255,255,0.04);
+      --border: rgba(255,255,255,0.08);
+    }
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 5vw; height: 64px;
+      background: rgba(10,10,20,0.9);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+    .logo {
+      font-size: 22px; font-weight: 800; letter-spacing: -0.5px;
+      background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .nav-back {
+      padding: 8px 20px; border-radius: 20px;
+      border: 1px solid rgba(108,71,255,0.5); color: #c0a8ff;
+      background: transparent; cursor: pointer; font-size: 14px; text-decoration: none;
+      transition: all .2s;
+    }
+    .nav-back:hover { background: rgba(108,71,255,0.15); }
+
+    .admin-wrap {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 100px 24px 60px;
+    }
+
+    .admin-title {
+      font-size: 32px;
+      font-weight: 800;
+      background: var(--grad);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 8px;
+    }
+    .admin-sub {
+      color: rgba(224,224,240,0.5);
+      font-size: 14px;
+      margin-bottom: 40px;
+    }
+
+    /* 登录区 */
+    .login-box {
+      max-width: 400px;
+      margin: 80px auto;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 40px;
+      text-align: center;
+    }
+    .login-box h2 {
+      font-size: 22px;
+      margin-bottom: 8px;
+    }
+    .login-box p {
+      font-size: 13px;
+      color: rgba(224,224,240,0.5);
+      margin-bottom: 24px;
+    }
+    .form-group { margin-bottom: 16px; text-align: left; }
+    .form-group label { font-size: 13px; color: rgba(224,224,240,0.6); display: block; margin-bottom: 6px; }
+    .form-input {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.05);
+      color: #e0e0f0;
+      font-size: 14px;
+      outline: none;
+      transition: border-color .2s;
+    }
+    .form-input:focus { border-color: rgba(108,71,255,0.6); }
+    .btn-submit {
+      width: 100%;
+      padding: 14px;
+      border-radius: 12px;
+      border: none;
+      background: var(--grad);
+      color: #fff;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity .2s;
+    }
+    .btn-submit:hover { opacity: 0.85; }
+    .login-error {
+      color: #ff6eb4;
+      font-size: 12px;
+      margin-top: 8px;
+      display: none;
+    }
+
+    /* 统计卡片 */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    .stat-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      text-align: center;
+    }
+    .stat-card .num {
+      font-size: 36px;
+      font-weight: 800;
+      background: var(--grad);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .stat-card .label { font-size: 13px; color: rgba(224,224,240,0.5); margin-top: 4px; }
+
+    /* 搜索 */
+    .search-box {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .search-box .form-input { flex: 1; }
+
+    /* 用户列表 */
+    .user-list { margin-bottom: 32px; }
+    .user-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 18px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: border-color .2s, background .2s;
+    }
+    .user-card:hover { border-color: rgba(108,71,255,0.4); background: rgba(108,71,255,0.05); }
+    .user-card.selected { border-color: #6c47ff; background: rgba(108,71,255,0.1); }
+    .user-info .user-name { font-size: 15px; font-weight: 600; }
+    .user-info .user-email { font-size: 12px; color: rgba(224,224,240,0.4); margin-top: 2px; }
+    .user-badges { display: flex; gap: 8px; align-items: center; }
+    .badge-points {
+      padding: 4px 12px;
+      border-radius: 20px;
+      background: rgba(108,71,255,0.2);
+      color: #c0a8ff;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .badge-date { font-size: 11px; color: rgba(224,224,240,0.3); }
+
+    /* 积分操作 */
+    .points-panel {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      margin-bottom: 32px;
+    }
+    .points-panel h3 { font-size: 16px; margin-bottom: 16px; color: rgba(224,224,240,0.8); }
+    .selected-user-info {
+      font-size: 13px;
+      color: rgba(224,224,240,0.6);
+      margin-bottom: 16px;
+      padding: 10px 14px;
+      background: rgba(108,71,255,0.08);
+      border-radius: 8px;
+    }
+    .points-form { display: flex; gap: 10px; align-items: center; }
+    .points-form .form-input { width: 140px; }
+    .points-form select {
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.05);
+      color: #e0e0f0;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .btn-apply {
+      padding: 12px 24px;
+      border-radius: 10px;
+      border: none;
+      background: var(--grad);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: opacity .2s;
+    }
+    .btn-apply:hover { opacity: 0.85; }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: rgba(108,71,255,0.9);
+      color: #fff;
+      padding: 12px 28px;
+      border-radius: 30px;
+      font-size: 14px;
+      transition: transform .3s ease;
+      z-index: 9999;
+      pointer-events: none;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+
+    /* 无选中提示 */
+    .no-selection {
+      text-align: center;
+      padding: 40px;
+      color: rgba(224,224,240,0.3);
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">✦ 创AI · 管理后台</div>
+  <a href="index.html" class="nav-back">← 返回首页</a>
+</nav>
+
+<div class="admin-wrap" id="adminWrap" style="display:none">
+
+  <div class="admin-title">🔐 管理员后台</div>
+  <div class="admin-sub">管理所有用户账户与积分数据</div>
+
+  <!-- 统计 -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="num" id="statUsers">0</div>
+      <div class="label">注册用户</div>
+    </div>
+    <div class="stat-card">
+      <div class="num" id="statPoints">0</div>
+      <div class="label">积分总量</div>
+    </div>
+    <div class="stat-card">
+      <div class="num" id="statWorks">0</div>
+      <div class="label">作品总数</div>
+    </div>
+  </div>
+
+  <!-- 搜索 -->
+  <div class="search-box">
+    <input class="form-input" type="text" id="searchInput" placeholder="搜索邮箱或昵称…" oninput="renderUserList()" />
+  </div>
+
+  <!-- 用户列表 -->
+  <div class="user-list" id="userList"></div>
+
+  <!-- 积分操作 -->
+  <div class="points-panel" id="pointsPanel">
+    <h3>✏️ 积分管理</h3>
+    <div id="selectedInfo" class="no-selection">👈 请从上方选择一个用户</div>
+    <div id="pointsForm" style="display:none">
+      <div id="selectedUserInfo" class="selected-user-info"></div>
+      <div class="points-form">
+        <input class="form-input" type="number" id="pointsInput" placeholder="积分数量" min="0" />
+        <select id="pointsAction">
+          <option value="add">➕ 增加</option>
+          <option value="subtract">➖ 减少</option>
+          <option value="set">🔢 设为</option>
+        </select>
+        <button class="btn-apply" onclick="applyPoints()">确认修改</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 登录框 -->
+<div class="login-box" id="loginBox">
+  <h2>🔐 管理员登录</h2>
+  <p>输入管理员密钥进入后台管理</p>
+  <div class="form-group">
+    <label>管理员密钥</label>
+    <input class="form-input" type="password" id="keyInput" placeholder="输入密钥…" onkeydown="if(event.key==='Enter')adminLogin()" />
+    <div class="login-error" id="loginError">密钥错误，请重试</div>
+  </div>
+  <button class="btn-submit" onclick="adminLogin()">进入后台</button>
+  <div style="font-size:11px;color:rgba(224,224,240,0.3);margin-top:16px">默认密钥: admin123</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const DB_KEY = 'chuangai_users';
+let selectedEmail = null;
+
+// localStorage helpers
+function getAllUsers() {
+  try { return JSON.parse(localStorage.getItem(DB_KEY)) || {}; }
+  catch { return {}; }
+}
+function saveUsers(data) { localStorage.setItem(DB_KEY, JSON.stringify(data)); }
+
+// Login
+function adminLogin() {
+  const key = document.getElementById('keyInput').value.trim();
+  if (key === 'admin123') {
+    sessionStorage.setItem('chuangai_admin', '1');
+    document.getElementById('loginBox').style.display = 'none';
+    document.getElementById('adminWrap').style.display = 'block';
+    renderStats();
+    renderUserList();
+  } else {
+    document.getElementById('loginError').style.display = 'block';
+    document.getElementById('keyInput').value = '';
+  }
+}
+
+// Check if already logged in
+if (sessionStorage.getItem('chuangai_admin') === '1') {
+  document.getElementById('loginBox').style.display = 'none';
+  document.getElementById('adminWrap').style.display = 'block';
+  renderStats();
+  renderUserList();
+}
+
+// Render stats
+function renderStats() {
+  const users = getAllUsers();
+  const list = Object.values(users);
+  const totalUsers = list.length;
+  const totalPoints = list.reduce((s, u) => s + (u.points || 0), 0);
+  const totalWorks = list.reduce((s, u) => s + (u.works ? u.works.length : 0), 0);
+  document.getElementById('statUsers').textContent = totalUsers;
+  document.getElementById('statPoints').textContent = totalPoints;
+  document.getElementById('statWorks').textContent = totalWorks;
+}
+
+// Render user list
+function renderUserList() {
+  const users = getAllUsers();
+  const filter = document.getElementById('searchInput').value.trim().toLowerCase();
+  const list = Object.entries(users)
+    .filter(([email, u]) => {
+      if (!filter) return true;
+      return email.toLowerCase().includes(filter) || (u.name && u.name.toLowerCase().includes(filter));
+    })
+    .sort((a, b) => new Date(b[1].created) - new Date(a[1].created));
+
+  const container = document.getElementById('userList');
+  if (list.length === 0) {
+    container.innerHTML = '<div style="text-align:center;padding:40px;color:rgba(224,224,240,0.3);font-size:14px">暂无用户记录</div>';
+    return;
+  }
+
+  container.innerHTML = list.map(([email, u]) => {
+    const date = new Date(u.created).toLocaleDateString('zh-CN');
+    const isSelected = selectedEmail === email;
+    return `<div class="user-card${isSelected ? ' selected' : ''}" onclick="selectUser('${email}')">
+      <div class="user-info">
+        <div class="user-name">${u.name || '未命名'}</div>
+        <div class="user-email">${email}</div>
+      </div>
+      <div class="user-badges">
+        <span class="badge-date">${date}</span>
+        <span class="badge-points">💎 ${u.points}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// Select user
+function selectUser(email) {
+  selectedEmail = email;
+  const users = getAllUsers();
+  const user = users[email];
+  document.getElementById('selectedInfo').style.display = 'none';
+  document.getElementById('pointsForm').style.display = 'block';
+  document.getElementById('selectedUserInfo').innerHTML = `已选中: <b>${user.name || email}</b>，当前积分: <b>💎 ${user.points}</b>`;
+  renderUserList();
+}
+
+// Apply points change
+function applyPoints() {
+  if (!selectedEmail) { showToast('请先选择用户'); return; }
+  const amount = parseInt(document.getElementById('pointsInput').value);
+  const action = document.getElementById('pointsAction').value;
+  if (isNaN(amount) || amount < 0) { showToast('请输入有效积分数量'); return; }
+  const users = getAllUsers();
+  let newPoints = users[selectedEmail].points;
+  if (action === 'add') newPoints += amount;
+  else if (action === 'subtract') newPoints = Math.max(0, newPoints - amount);
+  else if (action === 'set') newPoints = amount;
+  users[selectedEmail].points = newPoints;
+  saveUsers(users);
+  document.getElementById('pointsInput').value = '';
+  renderStats();
+  renderUserList();
+  selectUser(selectedEmail);
+  showToast(`已更新！现有 💎 ${newPoints} 积分`);
+}
+
+// Toast
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+</script>
+
+</body>
+</html>
