@@ -191,7 +191,19 @@
       background: var(--grad);
     }
     .demo-panel h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
-    .demo-panel .desc { font-size: 13px; color: rgba(224,224,240,0.45); margin-bottom: 24px; }
+    .demo-panel .desc { font-size: 13px; color: rgba(224,224,240,0.45); margin-bottom: 16px; }
+    .upload-area {
+      border: 2px dashed rgba(108,71,255,0.4);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color .2s, background .2s;
+      margin-bottom: 12px;
+      background: rgba(108,71,255,0.05);
+    }
+    .upload-area:hover { border-color: rgba(108,71,255,0.7); background: rgba(108,71,255,0.1); }
+    .upload-area .icon { font-size: 28px; }
     .demo-input {
       width: 100%; background: rgba(255,255,255,0.05);
       border: 1px solid var(--border); border-radius: 12px;
@@ -555,90 +567,89 @@
     <div class="section-sub" id="demoSub">注册即送100积分，每日签到再领积分。</div>
   </div>
   <div class="demo-box fade-in">
+
+    <!-- 1: 文生图 -->
     <div class="demo-panel">
-      <h3>🎨 AI 图片生成</h3>
-      <p class="desc">描述你想要的画面，AI帮你画出来</p>
-      <textarea class="demo-input" rows="4" placeholder="例如：一只可爱的柴犬坐在樱花树下，水彩风格，粉色调，超清画质"></textarea>
+      <h3>🎨 文生图</h3>
+      <p class="desc">输入文字描述，AI生成精美图片</p>
+      <textarea class="demo-input" id="t2iInput" rows="4" placeholder="例如：一只可爱的柴犬坐在樱花树下，水彩风格，超清画质"></textarea>
       <div class="demo-actions">
         <span class="demo-hint">💡 中文描述效果更佳</span>
-        <span class="demo-cost" id="imgCost">每次消耗 <b>10</b> 积分</span>
-        <button class="btn-gen" id="imgGenBtn">生成图片</button>
+        <span class="demo-cost" id="t2iCost">每次 <b>10</b> 积分</span>
+        <button class="btn-gen" id="t2iBtn">生成图片</button>
       </div>
-      <div class="demo-preview" id="imgPreview">
+      <div class="demo-preview" id="t2iPreview">
         <div class="icon">🖼️</div>
         <span>图片将在这里显示</span>
       </div>
     </div>
+
+    <!-- 2: 图生图 -->
     <div class="demo-panel">
-      <h3>🎬 AI 视频生成</h3>
-      <p class="desc">描述你想要的视频场景，AI帮你制作</p>
-      <textarea class="demo-input" rows="4" placeholder="例如：城市夜景延时摄影，霓虹灯流光溢彩，车流穿梭，科幻感十足"></textarea>
+      <h3>✏️ 图生图</h3>
+      <p class="desc">上传图片，AI根据描述进行编辑改造</p>
+      <div class="upload-area" id="i2iUploadArea" onclick="document.getElementById('i2iInput').click()">
+        <div id="i2iUploadHint">
+          <div style="font-size:24px;margin-bottom:6px">🖼️</div>
+          <div style="font-size:12px;color:rgba(224,224,240,0.5)">点击上传参考图</div>
+          <div style="font-size:11px;color:rgba(224,224,240,0.3);margin-top:4px">支持 JPG/PNG，建议 1:1 方图</div>
+        </div>
+        <img id="i2iImgPreview" style="display:none;width:100%;max-height:160px;object-fit:contain;border-radius:8px" />
+      </div>
+      <input type="file" id="i2iInput" accept="image/jpeg,image/png,image/webp" style="display:none" onchange="handleI2IUpload(this)" />
+      <textarea class="demo-input" id="i2iPrompt" rows="3" placeholder="描述你想对图片做的修改，如：将背景改为海边日落"></textarea>
+      <div class="demo-actions">
+        <span class="demo-hint">💡 上传图片 + 文字描述</span>
+        <span class="demo-cost" id="i2iCost">每次 <b>15</b> 积分</span>
+        <button class="btn-gen" id="i2iBtn">生成图片</button>
+      </div>
+      <div class="demo-preview" id="i2iPreview">
+        <div class="icon">🖼️</div>
+        <span>生成结果在这里显示</span>
+      </div>
+    </div>
+
+    <!-- 3: 文生视频 -->
+    <div class="demo-panel">
+      <h3>🎬 文生视频</h3>
+      <p class="desc">输入文字描述，AI生成动态视频</p>
+      <textarea class="demo-input" id="t2vInput" rows="4" placeholder="例如：城市夜景延时摄影，霓虹灯流光溢彩，科幻感十足"></textarea>
       <div class="demo-actions">
         <span class="demo-hint">⏱️ 生成约需1-3分钟</span>
-        <span class="demo-cost" id="videoCost">每次消耗 <b>50</b> 积分</span>
-        <button class="btn-gen" id="videoGenBtn">生成视频</button>
+        <span class="demo-cost" id="t2vCost">每次 <b>50</b> 积分</span>
+        <button class="btn-gen" id="t2vBtn">生成视频</button>
       </div>
-      <div class="demo-preview" id="videoPreview">
+      <div class="demo-preview" id="t2vPreview">
         <div class="icon">🎞️</div>
         <span>视频将在这里播放</span>
       </div>
     </div>
-  </div>
-</section>
 
-<!-- 上线指南 -->
-<section class="deploy-section" id="deploy">
-  <div class="fade-in">
-    <div class="section-label">上线指南</div>
-    <div class="section-title">让全世界都能访问你的网站</div>
-    <div class="section-sub">按以下步骤操作，5分钟完成部署，完全免费！</div>
-  </div>
-  <div class="deploy-steps fade-in">
-    <div class="deploy-step">
-      <div class="step-num">1</div>
-      <div class="step-content">
-        <h3>🏷️ 重命名入口文件 <span class="pending-check">○</span></h3>
-        <p>Vercel 识别 <code>index.html</code> 为网站入口。将当前的 <code>index.html</code> 保持不变，这是正确的。</p>
+    <!-- 4: 图生视频 -->
+    <div class="demo-panel">
+      <h3>📹 图生视频</h3>
+      <p class="desc">上传图片，AI让静态图片动起来</p>
+      <div class="upload-area" id="i2vUploadArea" onclick="document.getElementById('i2vInput').click()">
+        <div id="i2vUploadHint">
+          <div style="font-size:24px;margin-bottom:6px">🖼️</div>
+          <div style="font-size:12px;color:rgba(224,224,240,0.5)">点击上传图片</div>
+          <div style="font-size:11px;color:rgba(224,224,240,0.3);margin-top:4px">支持 1:1 / 16:9 / 9:16 比例</div>
+        </div>
+        <img id="i2vImgPreview" style="display:none;width:100%;max-height:160px;object-fit:contain;border-radius:8px" />
+      </div>
+      <input type="file" id="i2vInput" accept="image/jpeg,image/png,image/webp" style="display:none" onchange="handleI2VUpload(this)" />
+      <textarea class="demo-input" id="i2vPrompt" rows="3" placeholder="描述图片中物体的运动，如：人物转头看向镜头，背景缓慢移动"></textarea>
+      <div class="demo-actions">
+        <span class="demo-hint">⏱️ 生成约需1-3分钟</span>
+        <span class="demo-cost" id="i2vCost">每次 <b>60</b> 积分</span>
+        <button class="btn-gen" id="i2vBtn">生成视频</button>
+      </div>
+      <div class="demo-preview" id="i2vPreview">
+        <div class="icon">🎞️</div>
+        <span>生成结果在这里播放</span>
       </div>
     </div>
-    <div class="deploy-step">
-      <div class="step-num">2</div>
-      <div class="step-content">
-        <h3>📦 准备 GitHub <span class="pending-check">○</span></h3>
-        <p>如果还没有 GitHub 账号，先去注册一个：<strong>github.com</strong>（用邮箱注册，完全免费）</p>
-        <div class="note">💡 GitHub 是代码仓库，用来存放你的网站代码</div>
-      </div>
-    </div>
-    <div class="deploy-step">
-      <div class="step-num">3</div>
-      <div class="step-content">
-        <h3>⬆️ 上传到 GitHub <span class="pending-check">○</span></h3>
-        <p>在 GitHub 新建一个仓库（Repository），命名为 <code>chuang-ai</code>，设置为 Public（公开），然后把 <code>index.html</code> 上传进去。</p>
-        <div class="note">💡 可以用 GitHub 网页直接上传：点击仓库 → Add file → Upload files → 拖入 index.html → Commit changes</div>
-      </div>
-    </div>
-    <div class="deploy-step">
-      <div class="step-num">4</div>
-      <div class="step-content">
-        <h3>🚀 连接 Vercel <span class="pending-check">○</span></h3>
-        <p>打开 <strong>vercel.com</strong>，用 GitHub 账号登录，点击 "Add New Project"，选择刚才的 <code>chuang-ai</code> 仓库，点击 Deploy！</p>
-        <div class="note">💡 Vercel 会自动检测到 index.html 并配置好一切，无需任何设置</div>
-      </div>
-    </div>
-    <div class="deploy-step">
-      <div class="step-num">5</div>
-      <div class="step-content">
-        <h3>🌐 获得你的网址 <span class="pending-check">○</span></h3>
-        <p>部署完成后，Vercel 会给你一个免费域名，格式类似：<code>chuang-ai.vercel.app</code></p>
-        <p>任何人都可以通过这个网址访问你的AI创作平台！</p>
-        <div class="note">💡 可选：用阿里云/腾讯云购买域名（约50元/年），绑定到 Vercel，获得你自己的品牌域名</div>
-      </div>
-    </div>
-  </div>
 
-  <div class="success-banner fade-in">
-    <h3>🎉 恭喜！你的AI平台已上线！</h3>
-    <p>任何人都可以通过这个网址访问，所有功能（AI绘图、视频、积分系统）全部正常工作！</p>
   </div>
 </section>
 
@@ -744,7 +755,9 @@
 const DB_KEY = 'chuangai_users';
 const SESSION_KEY = 'chuangai_session';
 const IMG_COST = 10;
+const IMG2IMG_COST = 15;
 const VIDEO_COST = 50;
+const I2V_COST = 60;
 const CHECKIN_BASE = 10;
 let authMode = 'login';
 
@@ -804,20 +817,30 @@ function handleAuth(e) {
   pwInput.classList.remove('error'); document.getElementById('pwError').classList.remove('show');
 
   const users = getAllUsers();
-  const uid = hash(email);
-
   if (authMode === 'register') {
-    if (users[uid]) { showToast('该邮箱已注册，请直接登录'); authMode = 'login'; updateModalUI(); return; }
-    users[uid] = {
-      email, name: name || email.split('@')[0], pwHash: hash(pw), points: 100,
+    if (users[email]) { showToast('该邮箱已注册，请直接登录'); authMode = 'login'; updateModalUI(); return; }
+    users[email] = {
+      pwHash: hash(pw), name: name || email.split('@')[0], points: 100,
       created: new Date().toISOString(), checkinHistory: [], works: []
     };
-    saveUsers(users); sessionStorage.setItem(SESSION_KEY, uid);
+    saveUsers(users); sessionStorage.setItem(SESSION_KEY, email);
     showToast('注册成功！获得 100 积分 🎉'); closeModal(); updateNav();
   } else {
-    if (!users[uid] || users[uid].pwHash !== hash(pw)) { showToast('邮箱或密码错误'); return; }
-    sessionStorage.setItem(SESSION_KEY, uid);
+    if (!users[email] || users[email].pwHash !== hash(pw)) { showToast('邮箱或密码错误'); return; }
+    migrateUser(email); // 兼容旧版hash-key用户
+    sessionStorage.setItem(SESSION_KEY, email);
     showToast('登录成功，欢迎回来！'); closeModal(); updateNav();
+  }
+}
+
+// 兼容旧版：旧用户数据用hash做key，登录时自动迁移
+function migrateUser(email) {
+  const users = getAllUsers();
+  const uid = hash(email);
+  if (users[uid] && !users[email]) {
+    users[email] = users[uid];
+    delete users[uid];
+    saveUsers(users);
   }
 }
 
@@ -871,8 +894,9 @@ function closeUserPanel() {
 
 function updateUserPanel() {
   const user = getCurrentUser(); if (!user) return;
-  document.getElementById('panelName').textContent = user.name || user.email.split('@')[0];
-  document.getElementById('panelEmail').textContent = user.email;
+  const email = getSession();
+  document.getElementById('panelName').textContent = user.name || email.split('@')[0];
+  document.getElementById('panelEmail').textContent = email;
   document.getElementById('panelPoints').textContent = user.points;
   document.getElementById('panelImgCount').textContent = (user.works || []).filter(w => w.type === 'img').length;
   document.getElementById('panelVideoCount').textContent = (user.works || []).filter(w => w.type === 'video').length;
@@ -941,7 +965,7 @@ function updateNav() {
   const ctaSub = document.getElementById('ctaSub');
   const ctaBtn = document.getElementById('ctaBtn');
   if (user) {
-    demoSub.textContent = `你好，${user.name || user.email.split('@')[0]}！当前积分：${user.points}，每次生成会消耗积分。`;
+    demoSub.textContent = `你好，${user.name || getSession().split('@')[0]}！当前积分：${user.points}，每次生成会消耗积分。`;
     ctaSub.textContent = `当前积分：${user.points}，每日签到可获得更多积分，继续创作吧！`;
     ctaBtn.textContent = '💎 查看账户';
     ctaBtn.onclick = openUserPanel;
@@ -956,19 +980,21 @@ function updateNav() {
 
 function updateCostDisplay() {
   const pts = getPoints();
-  const imgCost = document.getElementById('imgCost');
-  const videoCost = document.getElementById('videoCost');
+  const t2iCost = document.getElementById('t2iCost');
+  const i2iCost = document.getElementById('i2iCost');
+  const t2vCost = document.getElementById('t2vCost');
+  const i2vCost = document.getElementById('i2vCost');
   if (pts === null) {
-    imgCost.innerHTML = '每次消耗 <b>10</b> 积分';
-    videoCost.innerHTML = '每次消耗 <b>50</b> 积分';
-    imgCost.className = 'demo-cost';
-    videoCost.className = 'demo-cost';
+    t2iCost.innerHTML = '每次 <b>10</b> 积分';
+    i2iCost.innerHTML = '每次 <b>15</b> 积分';
+    t2vCost.innerHTML = '每次 <b>50</b> 积分';
+    i2vCost.innerHTML = '每次 <b>60</b> 积分';
     return;
   }
-  imgCost.innerHTML = pts >= IMG_COST ? `每次消耗 <b>10</b> 积分（剩余 ${pts}）` : `<b>⚠️ 积分不足</b>（需要 10，当前 ${pts}）`;
-  videoCost.innerHTML = pts >= VIDEO_COST ? `每次消耗 <b>50</b> 积分（剩余 ${pts}）` : `<b>⚠️ 积分不足</b>（需要 50，当前 ${pts}）`;
-  imgCost.className = 'demo-cost ' + (pts >= IMG_COST ? 'affordable' : 'expensive');
-  videoCost.className = 'demo-cost ' + (pts >= VIDEO_COST ? 'affordable' : 'expensive');
+  t2iCost.innerHTML = pts >= IMG_COST ? `每次 <b>10</b> 积分（剩 ${pts}）` : `<b>⚠️ 不足</b>（需10，剩${pts}）`;
+  i2iCost.innerHTML = pts >= IMG2IMG_COST ? `每次 <b>15</b> 积分（剩 ${pts}）` : `<b>⚠️ 不足</b>（需15，剩${pts}）`;
+  t2vCost.innerHTML = pts >= VIDEO_COST ? `每次 <b>50</b> 积分（剩 ${pts}）` : `<b>⚠️ 不足</b>（需50，剩${pts}）`;
+  i2vCost.innerHTML = pts >= I2V_COST ? `每次 <b>60</b> 积分（剩 ${pts}）` : `<b>⚠️ 不足</b>（需60，剩${pts}）`;
 }
 
 function saveWork(type, url, prompt) {
@@ -998,9 +1024,30 @@ document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
 // ===== AI 绘图 =====
 const SILICONFLOW_KEY = 'sk-jrxpawwcdzikdnmanrcfogukjnhcisgcarjvfnrotdcihopi';
 const IMG_MODEL = 'Kwai-Kolors/Kolors';
-const imgBtn = document.getElementById('imgGenBtn');
-const imgInput = imgBtn.closest('.demo-panel').querySelector('.demo-input');
-const imgPreview = document.getElementById('imgPreview');
+const IMG2IMG_MODEL = 'Qwen/Qwen-Image-Edit-2509';
+const I2V_MODEL = 'Wan-AI/Wan2.2-I2V-A14B';
+
+// 文生图
+const t2iBtn = document.getElementById('t2iBtn');
+const t2iInput = document.getElementById('t2iInput');
+const t2iPreview = document.getElementById('t2iPreview');
+
+// 图生图
+let i2iBase64 = null;
+const i2iBtn = document.getElementById('i2iBtn');
+const i2iPrompt = document.getElementById('i2iPrompt');
+const i2iPreview = document.getElementById('i2iPreview');
+
+// 文生视频
+const t2vBtn = document.getElementById('t2vBtn');
+const t2vInput = document.getElementById('t2vInput');
+const t2vPreview = document.getElementById('t2vPreview');
+
+// 图生视频
+let i2vBase64 = null;
+const i2vBtn = document.getElementById('i2vBtn');
+const i2vPrompt = document.getElementById('i2vPrompt');
+const i2vPreview = document.getElementById('i2vPreview');
 
 function getPoints() {
   const session = sessionStorage.getItem(SESSION_KEY);
@@ -1009,16 +1056,16 @@ function getPoints() {
   return users[session] ? users[session].points : null;
 }
 
-imgBtn.addEventListener('click', async function () {
+t2iBtn.addEventListener('click', async function () {
   const session = sessionStorage.getItem(SESSION_KEY);
   if (!session) { openModal('login'); return; }
   const pts = getPoints();
   if (pts === null) { openModal('login'); return; }
   if (pts < IMG_COST) { showToast(`积分不足！需要 ${IMG_COST} 积分，当前 ${pts} 积分`); openUserPanel(); return; }
-  const prompt = imgInput.value.trim();
-  if (!prompt) { imgInput.style.borderColor = 'rgba(255,110,180,0.6)'; setTimeout(() => imgInput.style.borderColor = '', 1500); return; }
-  imgBtn.textContent = '生成中…'; imgBtn.disabled = true;
-  imgPreview.innerHTML = '<div style="font-size:32px;animation:spin 1.2s linear infinite">⚙️</div><span style="color:rgba(224,224,240,0.4);font-size:13px">AI 正在绘图，请稍候…</span>';
+  const prompt = t2iInput.value.trim();
+  if (!prompt) { t2iInput.style.borderColor = 'rgba(255,110,180,0.6)'; setTimeout(() => t2iInput.style.borderColor = '', 1500); return; }
+  t2iBtn.textContent = '生成中…'; t2iBtn.disabled = true;
+  t2iPreview.innerHTML = '<div style="font-size:32px;animation:spin 1.2s linear infinite">⚙️</div><span style="color:rgba(224,224,240,0.4);font-size:13px">AI 正在绘图，请稍候…</span>';
   try {
     const res = await fetch('https://api.siliconflow.cn/v1/images/generations', {
       method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SILICONFLOW_KEY}` },
@@ -1028,61 +1075,107 @@ imgBtn.addEventListener('click', async function () {
     if (data.data && data.data[0] && data.data[0].url) {
       const url = data.data[0].url;
       deductPoints(IMG_COST); saveWork('img', url, prompt);
-      imgPreview.innerHTML = `<img src="${url}" alt="AI生成图片" style="width:100%;height:100%;object-fit:cover;border-radius:10px;display:block;" />`;
+      t2iPreview.innerHTML = `<img src="${url}" alt="AI生成图片" style="width:100%;height:100%;object-fit:cover;border-radius:10px;display:block;" />`;
       const dlBtn = document.createElement('a');
       dlBtn.href = url; dlBtn.download = 'ai-image.png'; dlBtn.target = '_blank';
       dlBtn.style.cssText = 'display:block;margin-top:12px;text-align:center;padding:8px 20px;border-radius:20px;background:rgba(108,71,255,0.2);color:#b49fff;font-size:13px;text-decoration:none;border:1px solid rgba(108,71,255,0.3);';
       dlBtn.textContent = '⬇️ 下载图片';
-      imgPreview.after(dlBtn);
+      t2iPreview.after(dlBtn);
       showToast('生成成功！-10积分');
     } else {
       const errMsg = data.error ? data.error.message : JSON.stringify(data);
-      imgPreview.innerHTML = `<span style="color:#ff6eb4;font-size:13px">生成失败：${errMsg}</span>`;
+      t2iPreview.innerHTML = `<span style="color:#ff6eb4;font-size:13px">生成失败：${errMsg}</span>`;
     }
-  } catch (e) { imgPreview.innerHTML = `<span style="color:#ff6eb4;font-size:13px">网络错误：${e.message}</span>`; }
-  finally { imgBtn.textContent = '重新生成'; imgBtn.disabled = false; }
+  } catch (e) { t2iPreview.innerHTML = `<span style="color:#ff6eb4;font-size:13px">网络错误：${e.message}</span>`; }
+  finally { t2iBtn.textContent = '重新生成'; t2iBtn.disabled = false; }
+});
+
+// ===== 图生图 =====
+function handleI2IUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    i2iBase64 = e.target.result;
+    document.getElementById('i2iImgPreview').src = i2iBase64;
+    document.getElementById('i2iImgPreview').style.display = 'block';
+    document.getElementById('i2iUploadHint').style.display = 'none';
+  };
+  reader.readAsDataURL(file);
+}
+
+i2iBtn.addEventListener('click', async function () {
+  const session = sessionStorage.getItem(SESSION_KEY);
+  if (!session) { openModal('login'); return; }
+  const pts = getPoints();
+  if (pts === null) { openModal('login'); return; }
+  if (pts < IMG2IMG_COST) { showToast(`积分不足！需要 ${IMG2IMG_COST} 积分，当前 ${pts} 积分`); openUserPanel(); return; }
+  if (!i2iBase64) { showToast('请先上传参考图片'); return; }
+  const prompt = i2iPrompt.value.trim();
+  if (!prompt) { i2iPrompt.style.borderColor = 'rgba(255,110,180,0.6)'; setTimeout(() => i2iPrompt.style.borderColor = '', 1500); return; }
+  i2iBtn.textContent = '生成中…'; i2iBtn.disabled = true;
+  i2iPreview.innerHTML = '<div style="font-size:32px;animation:spin 1.2s linear infinite">⚙️</div><span style="color:rgba(224,224,240,0.4);font-size:13px">AI 正在处理，请稍候…</span>';
+  try {
+    const res = await fetch('https://api.siliconflow.cn/v1/images/generations', {
+      method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SILICONFLOW_KEY}` },
+      body: JSON.stringify({ model: IMG2IMG_MODEL, prompt: prompt, image: i2iBase64, num_inference_steps: 50, cfg: 4.0 })
+    });
+    const data = await res.json();
+    if (data.images && data.images[0] && data.images[0].url) {
+      const url = data.images[0].url;
+      deductPoints(IMG2IMG_COST); saveWork('img', url, prompt);
+      i2iPreview.innerHTML = `<img src="${url}" alt="AI生成图片" style="width:100%;height:100%;object-fit:cover;border-radius:10px;display:block;" />`;
+      const dlBtn = document.createElement('a');
+      dlBtn.href = url; dlBtn.download = 'ai-edit.png'; dlBtn.target = '_blank';
+      dlBtn.style.cssText = 'display:block;margin-top:12px;text-align:center;padding:8px 20px;border-radius:20px;background:rgba(108,71,255,0.2);color:#b49fff;font-size:13px;text-decoration:none;border:1px solid rgba(108,71,255,0.3);';
+      dlBtn.textContent = '⬇️ 下载图片';
+      i2iPreview.after(dlBtn);
+      showToast('生成成功！-15积分');
+    } else {
+      const errMsg = data.error ? data.error.message : JSON.stringify(data);
+      i2iPreview.innerHTML = `<span style="color:#ff6eb4;font-size:13px">生成失败：${errMsg}</span>`;
+    }
+  } catch (e) { i2iPreview.innerHTML = `<span style="color:#ff6eb4;font-size:13px">网络错误：${e.message}</span>`; }
+  finally { i2iBtn.textContent = '重新生成'; i2iBtn.disabled = false; }
 });
 
 // ===== AI 视频 =====
-const VIDEO_MODEL = 'Wan-AI/Wan2.2-T2V-A14B';
-const videoBtn = document.getElementById('videoGenBtn');
-const videoInput = videoBtn.closest('.demo-panel').querySelector('.demo-input');
-const videoPreview = document.getElementById('videoPreview');
+const T2V_MODEL = 'Wan-AI/Wan2.2-T2V-A14B';
 
-function setVideoStatus(icon, text, spin) {
-  videoPreview.innerHTML = `<div style="font-size:32px;${spin?'animation:spin 1.2s linear infinite':''}">${icon}</div><span style="color:rgba(224,224,240,0.5);font-size:13px;text-align:center;padding:0 16px;display:block">${text}</span>`;
+function setT2VStatus(icon, text, spin) {
+  t2vPreview.innerHTML = `<div style="font-size:32px;${spin?'animation:spin 1.2s linear infinite':''}">${icon}</div><span style="color:rgba(224,224,240,0.5);font-size:13px;text-align:center;padding:0 16px;display:block">${text}</span>`;
 }
 
-videoBtn.addEventListener('click', async function () {
+t2vBtn.addEventListener('click', async function () {
   const session = sessionStorage.getItem(SESSION_KEY);
   if (!session) { openModal('login'); return; }
   const pts = getPoints();
   if (pts === null) { openModal('login'); return; }
   if (pts < VIDEO_COST) { showToast(`积分不足！需要 ${VIDEO_COST} 积分，当前 ${pts} 积分`); openUserPanel(); return; }
-  const prompt = videoInput.value.trim();
-  if (!prompt) { videoInput.style.borderColor = 'rgba(255,110,180,0.6)'; setTimeout(() => videoInput.style.borderColor = '', 1500); return; }
-  videoBtn.textContent = '提交中…'; videoBtn.disabled = true;
-  setVideoStatus('⚙️', '正在提交任务…', true);
+  const prompt = t2vInput.value.trim();
+  if (!prompt) { t2vInput.style.borderColor = 'rgba(255,110,180,0.6)'; setTimeout(() => t2vInput.style.borderColor = '', 1500); return; }
+  t2vBtn.textContent = '提交中…'; t2vBtn.disabled = true;
+  setT2VStatus('⚙️', '正在提交任务…', true);
 
   let requestId = null;
   for (let attempt = 1; attempt <= 3; attempt++) {
     try {
       const submitRes = await fetch('https://api.siliconflow.cn/v1/video/submit', {
         method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SILICONFLOW_KEY}` },
-        body: JSON.stringify({ model: VIDEO_MODEL, prompt: prompt, image_size: '1280x720' })
+        body: JSON.stringify({ model: T2V_MODEL, prompt: prompt, image_size: '1280x720' })
       });
       const submitData = await submitRes.json();
       if (submitData.requestId) { requestId = submitData.requestId; break; }
-      if (attempt < 3) { setVideoStatus('⏳', `服务繁忙，正在重试（${attempt}/3）…`, false); await new Promise(r => setTimeout(r, 3000)); }
-      else { setVideoStatus('❌', '提交失败：' + (submitData.message || JSON.stringify(submitData).slice(0, 80)), false); videoBtn.textContent = '重新生成'; videoBtn.disabled = false; return; }
+      if (attempt < 3) { setT2VStatus('⏳', `服务繁忙，正在重试（${attempt}/3）…`, false); await new Promise(r => setTimeout(r, 3000)); }
+      else { setT2VStatus('❌', '提交失败：' + (submitData.message || JSON.stringify(submitData).slice(0, 80)), false); t2vBtn.textContent = '重新生成'; t2vBtn.disabled = false; return; }
     } catch(e) {
-      if (attempt === 3) { setVideoStatus('❌', '网络错误：' + e.message, false); videoBtn.textContent = '重新生成'; videoBtn.disabled = false; return; }
+      if (attempt === 3) { setT2VStatus('❌', '网络错误：' + e.message, false); t2vBtn.textContent = '重新生成'; t2vBtn.disabled = false; return; }
       await new Promise(r => setTimeout(r, 3000));
     }
   }
 
-  setVideoStatus('🎬', '任务已提交，AI 排队生成中…<br><small style="opacity:.5">视频通常需要 1~3 分钟，请耐心等待</small>', true);
-  videoBtn.textContent = '生成中…';
+  setT2VStatus('🎬', '任务已提交，AI 排队生成中…<br><small style="opacity:.5">视频通常需要 1~3 分钟，请耐心等待</small>', true);
+  t2vBtn.textContent = '生成中…';
   let elapsed = 0; const maxWait = 300; const pollInterval = 6;
   const timer = setInterval(async () => {
     elapsed += pollInterval;
@@ -1092,24 +1185,103 @@ videoBtn.addEventListener('click', async function () {
         body: JSON.stringify({ requestId: requestId })
       });
       const sd = await statusRes.json(); const status = sd.status;
-      if (status === 'InQueue') setVideoStatus('⏳', `AI 排队中，已等待 ${elapsed} 秒…<br><small style="opacity:.5">队列繁忙时需要多等一会儿</small>`, false);
-      else if (status === 'Processing') setVideoStatus('🎬', `AI 生成中，已等待 ${elapsed} 秒…<br><small style="opacity:.5">快好了，请继续等待</small>`, true);
+      if (status === 'InQueue') setT2VStatus('⏳', `AI 排队中，已等待 ${elapsed} 秒…`, false);
+      else if (status === 'Processing') setT2VStatus('🎬', `AI 生成中，已等待 ${elapsed} 秒…`, true);
       else if (status === 'Succeed') {
         clearInterval(timer);
         const videoUrl = sd.results && sd.results.videos && sd.results.videos[0] && sd.results.videos[0].url;
         if (videoUrl) {
           deductPoints(VIDEO_COST); saveWork('video', videoUrl, prompt);
-          videoPreview.innerHTML = `<video controls autoplay loop style="width:100%;border-radius:10px;display:block;"><source src="${videoUrl}" type="video/mp4"></video>`;
+          t2vPreview.innerHTML = `<video controls autoplay loop style="width:100%;border-radius:10px;display:block;"><source src="${videoUrl}" type="video/mp4"></video>`;
           const dlBtn = document.createElement('a');
           dlBtn.href = videoUrl; dlBtn.download = 'ai-video.mp4'; dlBtn.target = '_blank';
           dlBtn.style.cssText = 'display:block;margin-top:12px;text-align:center;padding:8px 20px;border-radius:20px;background:rgba(255,110,180,0.15);color:#ffb4d9;font-size:13px;text-decoration:none;border:1px solid rgba(255,110,180,0.3);';
           dlBtn.textContent = '⬇️ 下载视频';
-          videoPreview.after(dlBtn);
+          t2vPreview.after(dlBtn);
           showToast('生成成功！-50积分');
-        } else { setVideoStatus('⚠️', '生成完成，但未获取到视频链接，请重试', false); }
-        videoBtn.textContent = '重新生成'; videoBtn.disabled = false;
-      } else if (status === 'Failed') { clearInterval(timer); setVideoStatus('❌', '生成失败，请换个描述再试', false); videoBtn.textContent = '重新生成'; videoBtn.disabled = false; }
-      else if (elapsed >= maxWait) { clearInterval(timer); setVideoStatus('⏰', '等待超时，请稍后重试', false); videoBtn.textContent = '重新生成'; videoBtn.disabled = false; }
+        } else { setT2VStatus('⚠️', '生成完成，但未获取到视频链接，请重试', false); }
+        t2vBtn.textContent = '重新生成'; t2vBtn.disabled = false;
+      } else if (status === 'Failed') { clearInterval(timer); setT2VStatus('❌', '生成失败，请换个描述再试', false); t2vBtn.textContent = '重新生成'; t2vBtn.disabled = false; }
+      else if (elapsed >= maxWait) { clearInterval(timer); setT2VStatus('⏰', '等待超时，请稍后重试', false); t2vBtn.textContent = '重新生成'; t2vBtn.disabled = false; }
+    } catch(e) {}
+  }, pollInterval * 1000);
+});
+
+// ===== 图生视频 =====
+function handleI2VUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    i2vBase64 = e.target.result;
+    document.getElementById('i2vImgPreview').src = i2vBase64;
+    document.getElementById('i2vImgPreview').style.display = 'block';
+    document.getElementById('i2vUploadHint').style.display = 'none';
+  };
+  reader.readAsDataURL(file);
+}
+
+function setI2VStatus(icon, text, spin) {
+  i2vPreview.innerHTML = `<div style="font-size:32px;${spin?'animation:spin 1.2s linear infinite':''}">${icon}</div><span style="color:rgba(224,224,240,0.5);font-size:13px;text-align:center;padding:0 16px;display:block">${text}</span>`;
+}
+
+i2vBtn.addEventListener('click', async function () {
+  const session = sessionStorage.getItem(SESSION_KEY);
+  if (!session) { openModal('login'); return; }
+  const pts = getPoints();
+  if (pts === null) { openModal('login'); return; }
+  if (pts < I2V_COST) { showToast(`积分不足！需要 ${I2V_COST} 积分，当前 ${pts} 积分`); openUserPanel(); return; }
+  if (!i2vBase64) { showToast('请先上传图片'); return; }
+  const prompt = i2vPrompt.value.trim();
+  i2vBtn.textContent = '提交中…'; i2vBtn.disabled = true;
+  setI2VStatus('⚙️', '正在提交任务…', true);
+
+  let requestId = null;
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      const submitRes = await fetch('https://api.siliconflow.cn/v1/video/submit', {
+        method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SILICONFLOW_KEY}` },
+        body: JSON.stringify({ model: I2V_MODEL, prompt: prompt, image: i2vBase64, image_size: '1280x720' })
+      });
+      const submitData = await submitRes.json();
+      if (submitData.requestId) { requestId = submitData.requestId; break; }
+      if (attempt < 3) { setI2VStatus('⏳', `服务繁忙，正在重试（${attempt}/3）…`, false); await new Promise(r => setTimeout(r, 3000)); }
+      else { setI2VStatus('❌', '提交失败：' + (submitData.message || JSON.stringify(submitData).slice(0, 80)), false); i2vBtn.textContent = '重新生成'; i2vBtn.disabled = false; return; }
+    } catch(e) {
+      if (attempt === 3) { setI2VStatus('❌', '网络错误：' + e.message, false); i2vBtn.textContent = '重新生成'; i2vBtn.disabled = false; return; }
+      await new Promise(r => setTimeout(r, 3000));
+    }
+  }
+
+  setI2VStatus('🎬', '任务已提交，AI 排队生成中…<br><small style="opacity:.5">视频通常需要 1~3 分钟，请耐心等待</small>', true);
+  i2vBtn.textContent = '生成中…';
+  let elapsed = 0; const maxWait = 300; const pollInterval = 6;
+  const timer = setInterval(async () => {
+    elapsed += pollInterval;
+    try {
+      const statusRes = await fetch('https://api.siliconflow.cn/v1/video/status', {
+        method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SILICONFLOW_KEY}` },
+        body: JSON.stringify({ requestId: requestId })
+      });
+      const sd = await statusRes.json(); const status = sd.status;
+      if (status === 'InQueue') setI2VStatus('⏳', `AI 排队中，已等待 ${elapsed} 秒…`, false);
+      else if (status === 'Processing') setI2VStatus('🎬', `AI 生成中，已等待 ${elapsed} 秒…`, true);
+      else if (status === 'Succeed') {
+        clearInterval(timer);
+        const videoUrl = sd.results && sd.results.videos && sd.results.videos[0] && sd.results.videos[0].url;
+        if (videoUrl) {
+          deductPoints(I2V_COST); saveWork('video', videoUrl, prompt || '图生视频');
+          i2vPreview.innerHTML = `<video controls autoplay loop style="width:100%;border-radius:10px;display:block;"><source src="${videoUrl}" type="video/mp4"></video>`;
+          const dlBtn = document.createElement('a');
+          dlBtn.href = videoUrl; dlBtn.download = 'ai-video.mp4'; dlBtn.target = '_blank';
+          dlBtn.style.cssText = 'display:block;margin-top:12px;text-align:center;padding:8px 20px;border-radius:20px;background:rgba(255,110,180,0.15);color:#ffb4d9;font-size:13px;text-decoration:none;border:1px solid rgba(255,110,180,0.3);';
+          dlBtn.textContent = '⬇️ 下载视频';
+          i2vPreview.after(dlBtn);
+          showToast(`生成成功！-${I2V_COST}积分`);
+        } else { setI2VStatus('⚠️', '生成完成，但未获取到视频链接，请重试', false); }
+        i2vBtn.textContent = '重新生成'; i2vBtn.disabled = false;
+      } else if (status === 'Failed') { clearInterval(timer); setI2VStatus('❌', '生成失败，请重试', false); i2vBtn.textContent = '重新生成'; i2vBtn.disabled = false; }
+      else if (elapsed >= maxWait) { clearInterval(timer); setI2VStatus('⏰', '等待超时，请稍后重试', false); i2vBtn.textContent = '重新生成'; i2vBtn.disabled = false; }
     } catch(e) {}
   }, pollInterval * 1000);
 });
